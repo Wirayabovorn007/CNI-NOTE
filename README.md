@@ -39,3 +39,21 @@ switchport mode access
 switchport access vlan 8
 no shutdown
 ```
+
+### Inter VLAN
+```
+
+```
+
+### DHCP
+```
+! --- Create Pool for each network---
+ip dhcp pool LEFT_NET
+ network 192.168.10.0 255.255.255.0
+ default-router 192.168.10.1
+ dns-server 8.8.8.8
+ exit
+
+! --- Exclude the Gateway IPs so they aren't given to PCs ---
+ip dhcp excluded-address 192.168.10.1
+```
