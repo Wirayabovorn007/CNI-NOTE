@@ -2,6 +2,8 @@
 
 This is for me na krub no share
 
+## List of contents:
+
 ## Subnet calculation
 ![Subnet Calculation](./src/IMG_0933.PNG)
 
@@ -42,7 +44,7 @@ no shutdown
 
 ## Inter VLAN 
 ### Trunk port
-After create VLANs first link to router
+- After create VLANs first link to router
 ```
 interface Gi0/0
  description UPLINK_TO_ROUTER
@@ -52,7 +54,7 @@ interface Gi0/0
  no shutdown
  exit
 ```
-Second, do configure between switch
+- Second, do configure between switch
 ```
 interface range Gi0/3 - 4
  description LINK_TO_SWITCH2
@@ -63,14 +65,14 @@ interface range Gi0/3 - 4
  end
 ```
 ### Router (The Stick)
-Prepare the Physical Interface 
+- Prepare the Physical Interface 
 ```
 interface Gi0/0
  no shutdown
  no ip address
  exit
 ```
-Create Sub-Interface for VLAN 8, 9 
+- Create Sub-Interface for VLAN 8, 9 
 ```
 interface Gi0/0.8-Gi0.9
  encapsulation dot1q 8-9    <-- This number '8' MUST match the VLAN ID
@@ -84,7 +86,7 @@ ip route <dest network> <dest subnet>
 ```
 
 ## DHCP
-Create Pool for each network
+- Create Pool for each network
 ```
 ip dhcp pool LEFT_NET
  network 192.168.10.0 255.255.255.0
@@ -92,7 +94,100 @@ ip dhcp pool LEFT_NET
  dns-server 8.8.8.8
  exit
 ```
-Exclude the Gateway IPs so they aren't given to PCs
+- Exclude the Gateway IPs so they aren't given to PCs
 ```
 ip dhcp excluded-address 192.168.10.1
+```
+- Exclude IP addresses with range. For this example router will allocate the IP addresses 192.168.10.50 - 192.168.10.254
+```
+ip dhcp excluded-address 192.168.10.1 192.168.10.49
+```
+
+## ACL
+### First define rules
+- Block ICMP echo, Telnet, SSH, HTTP
+```
+access-list 100 deny icmp host <PC1_IP> host <PC3_IP> echo
+access-list 100 deny tcp host 172.24.10.1 host 192.168.10.3 eq 23
+access-list 100 deny tcp host 172.24.10.1 host 192.168.10.3 eq 22
+access-list 100 deny tcp host 172.24.10.1 host 192.168.10.3 eq 80
+```
+- Don't forget to
+```
+access-list 100 permit ip any any
+```
+- Apply rules to interface
+```
+interface Gi0/0
+ ip access-group 100 in
+```
+
+## HTTP server
+### Swtich & Router
+- HTTP
+```
+ip http server
+ip http authentication local
+```
+- HTTPS
+```
+ip http secure-server
+```
+
+## TFTP server
+- For download startup config
+```
+tftp-server nvram:start-config
+```
+
+## NAT
+### Static NAT
+- Define "Inside" and "Outside" Interfaces
+```
+interface Gi0/0
+ ip nat inside
+ exit
+
+interface Gi0/2
+ ip nat outside
+ exit
+```
+- Create the Static Mapping
+```
+! Syntax: ip nat inside source static <LOCAL_IP> <PUBLIC_IP>
+ip nat inside source static 172.24.10.2 192.168.122.50
+```
+- Don't forget to create the route
+```
+ip route 0.0.0.0 0.0.0.0 <PUBLIC IP HOP>
+```
+- For verification
+```
+show ip nat translations
+```
+### Dynamic NAT
+Steps:
+1. Define inside and outside interfaces
+2. Create an Access List
+```
+! Syntax: access-list <number> permit <source_network> <wildcard_mask>
+access-list 1 permit 172.24.10.0 0.0.0.255
+```
+3. Create the NAT Pool
+```
+! Syntax: ip nat pool <POOL_NAME> <START_IP> <END_IP> netmask <MASK>
+ip nat pool PUBLIC_POOL 192.168.122.50 192.168.122.60 netmask 255.255.255.0
+```
+4. Link Them Together
+```
+! Syntax: ip nat inside source list <ACL_NUM> pool <POOL_NAME>
+ip nat inside source list 1 pool PUBLIC_POOL
+```
+
+## PAT
+Remove the old NAT rule first if it exists in running-config.
+- Change from linking with pool to interface instead.
+```
+! Syntax: ip nat inside source list <ACL> interface <OUTSIDE_INT> overload
+ip nat inside source list 1 interface Gi0/2 overload
 ```
