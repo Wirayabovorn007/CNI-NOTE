@@ -1,8 +1,19 @@
 # CNI-CMDs-NOTE
 
-This is for me na krub no share
+> This is for me na krub no share
 
-## List of contents:
+##  List of Contents
+
+- Subnet Calculation  
+- Basic Router & Switch Commands  
+- VLAN Configuration  
+- Inter-VLAN Routing  
+- Static Routing  
+- DHCP  
+- ACL  
+- HTTP / HTTPS Server  
+- NAT (Static, Dynamic, PAT)  
+- DNS Server  
 
 ## Subnet calculation
 ![Subnet Calculation](./src/IMG_0933.PNG)
