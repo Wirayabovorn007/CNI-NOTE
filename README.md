@@ -134,11 +134,6 @@ ip http authentication local
 ip http secure-server
 ```
 
-## TFTP server
-- For download startup config
-```
-tftp-server nvram:start-config
-```
 
 ## NAT
 ### Static NAT
@@ -190,4 +185,30 @@ Remove the old NAT rule first if it exists in running-config.
 ```
 ! Syntax: ip nat inside source list <ACL> interface <OUTSIDE_INT> overload
 ip nat inside source list 1 interface Gi0/2 overload
+```
+
+## DNS Server
+- Enable the DNS Server Service at Router
+```
+ip dns server
+ip domain-name mylab.local
+ip name-server 8.8.8.8
+```
+- Create the phonebook on router, so you can ping them by name!
+```
+ip host PC1 172.24.10.2
+ip host PC2 172.24.10.3
+ip host PC3 192.168.10.3
+ip host PC4 192.168.10.4
+ip host Router1 172.24.10.1
+ip host Router2 192.168.10.1
+```
+- Update DHCP to use the Router as DNS
+```
+! --- Find your DHCP Pool Name ---
+! (Use 'do show run | sec dhcp' if you forgot the name)
+ip dhcp pool LEFT_NET   <-- Use your actual pool name here
+
+! --- Change the DNS Server to Router-1's IP ---
+dns-server 172.24.10.1
 ```
