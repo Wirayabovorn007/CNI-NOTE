@@ -115,6 +115,10 @@ ip dhcp excluded-address 192.168.10.1
 ```
 ip dhcp excluded-address 192.168.10.1 192.168.10.49
 ```
+## DHCP relay
+```
+ip helper-address <DHCP_Server_IP_Address>
+```
 
 ## ACL
 ### First define rules
