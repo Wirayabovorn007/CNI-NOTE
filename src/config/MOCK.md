@@ -154,3 +154,8 @@ exit
 ```
 Ubuntu 1: echo "nameserver 172.61.195.129" | sudo tee /etc/resolv.conf
 ```
+Important!!! อย่าลืม map dns ใหม่ ถ้าจำเป็น
+```
+Router2: ip host SW.itkmitl.lab 172.61.195.158
+Router2: ip host web.itkmitl.lab 10.70.38.253
+```
