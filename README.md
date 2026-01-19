@@ -16,9 +16,9 @@
 - DNS Server  
 
 ## Subnet calculation
-![Subnet Calculation](./src/IMG_0933.PNG)
+![Subnet Calculation](./src/pics/IMG_0933.PNG)
 ## Network config in Ubuntu server
-![Ubuntu Server](./src/ipcon.png)
+![Ubuntu Server](./src/pics/ipcon.png)
 
 ## Basic commands for Router & Switch configuration
 ```
