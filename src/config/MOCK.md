@@ -159,3 +159,23 @@ Important!!! อย่าลืม map dns ใหม่ ถ้าจำเป็
 Router2: ip host SW.itkmitl.lab 172.61.195.158
 Router2: ip host web.itkmitl.lab 10.70.38.253
 ```
+
+## Part4: Security
+- ไม่อนุญาตให้ ubuntu2 Telnet มาที่ Switch ได้ แต่เครื่องอื่นๆ (รวม Router1, Router2, ubuntu1) ต้อง Telnet มาได้ทั้งหมด ด้วย IPv4
+```
+access-list 10 deny 172.61.149.192 0.0.0.63
+access-list 10 permit any
+line vty 0 4
+ access-class 10 in
+ exit
+```
+
+- ไม่อนุญาตให้ ubuntu2 Ping IPv4 มาที่ ubuntu1 ได้ แต่ให้ ubuntu1 Ping IPv4 มาที่ ubuntu2 ได้ โดยการตั้ง ACL ที่ Router2
+```
+ip access-list extended 100
+ deny icmp 172.61.149.192 0.0.0.63 host 172.61.195.130 echo
+ permit ip any any
+interface Ethernet0/0.149
+ ip access-group 100 in
+exit
+```
