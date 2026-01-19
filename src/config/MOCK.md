@@ -179,3 +179,74 @@ interface Ethernet0/0.149
  ip access-group 100 in
 exit
 ```
+
+## Part5: IPv6 Assignment
+DHCP
+![ipv6 config](../pics/ipv6.png)
+1. สร้าง Pool
+```
+ipv6 dhcp pool STATEFUL_POOL
+ address prefix 2001:6707:166:149::/64
+ dns-server 2001:4860:4860::8888 
+ domain-name itkmitl.lab
+exit
+```
+2. ผูก Pool กับ Interface
+```
+interface Ethernet0/0.149
+ ipv6 dhcp server STATEFUL_POOL
+```
+3. สั่งเปลี่ยนโหมด M-Flag
+```
+interface Ethernet0/0.149
+ ipv6 nd managed-config-flag   
+ ipv6 nd prefix 2001:6707:166:149::/64 14400 14400 no-autoconfig
+```
+
+SLAAC
+![ipv6 config](../pics/slaac.png)
+1. ipv6 unicast-routing
+2. กำหนด IP Address ที่ Interface ขาลง
+### Router1 เฉยๆ
+Set IPv6 
+```
+configure terminal
+ipv6 unicast-routing
+interface Ethernet0/0
+ ipv6 enable
+ ipv6 address 2001:6707:XXX:224::1/64
+ ipv6 address FE80::1 link-local
+ no shutdown
+exit
+ipv6 route 2001:6707:XXX:195::/64 2001:6707:XXX:224::2
+ipv6 route 2001:6707:XXX:149::/64 2001:6707:XXX:224::2
+```
+### Router2
+```
+configure terminal
+ipv6 unicast-routing
+interface Ethernet0/1
+ ipv6 enable
+ ipv6 address 2001:6707:XXX:224::2/64
+ ipv6 address FE80::2 link-local
+ no shutdown
+exit
+
+interface Ethernet0/0.195
+ ipv6 enable
+ ipv6 address 2001:6707:XXX:195::1/64
+ ipv6 address FE80::1 link-local
+exit
+
+interface Ethernet0/0.149
+ ipv6 enable
+ ipv6 address 2001:6707:XXX:149::1/64
+ ipv6 address FE80::1 link-local
+exit
+ipv6 route ::/0 2001:6707:XXX:224::1
+```
+### Switch
+```
+! ipv6 route [ปลายทาง] [Interfaceขาออก] [Next-Hop]
+ipv6 route ::/0 Vlan195 FE80::1
+```

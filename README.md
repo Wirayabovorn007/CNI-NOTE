@@ -229,3 +229,17 @@ ip dhcp pool LEFT_NET   <-- Use your actual pool name here
 ! --- Change the DNS Server to Router-1's IP ---
 dns-server 172.24.10.1
 ```
+
+## IPv6 routing
+- With local link
+```
+ipv6 route destination-prefix/length {ipv6-link-local-address%interface-type interface-number | exit-interface} [administrative-distance]
+```
+- Normal
+```
+ipv6 route ::/0 2001:6707:XXX:224::1
+```
+- With interface
+```
+ipv6 route ::/0 Vlan195 FE80::1
+```
